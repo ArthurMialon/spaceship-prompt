@@ -24,12 +24,16 @@ spaceship_package() {
 
   # Show package version only when repository is a package
   # @todo: add more package managers
-  [[ -f package.json ]] || return
+  [[ -f package.json || -f lerna.json ]] || return
 
   spaceship::exists npm || return
 
   # Grep and cut out package version
-  local package_version=$(grep -E '"version": "v?([0-9]+\.){1,}' package.json | cut -d\" -f4 2> /dev/null)
+  if [ -f lerna.json ]; then
+    local package_version=$(grep -E '"version": "v?([0-9]+\.){1,}' lerna.json | cut -d\" -f4 2> /dev/null)
+  else
+    local package_version=$(grep -E '"version": "v?([0-9]+\.){1,}' package.json | cut -d\" -f4 2> /dev/null)
+  fi
 
   # Handle version not found
   if [ ! "$package_version" ]; then
